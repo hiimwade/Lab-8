@@ -25,7 +25,19 @@ def get_married_couples():
         list: (name1, name2, start_date) of married couples 
     """
     # TODO: Function body
-    # Hint: See example code in lab instructions entitled "Get a List of Relationships"
+    con = sqlite3.connect('social_network.db')
+    cur = con.cursor()
+    married_couple_query= """
+        SELECT person1.name, person2.name, start_date, type FROM relationships
+        JOIN people person1 ON person1_id = person1.id
+        JOIN people person2 ON person2_id = person2.id;
+        WHERE r.type = 'spouse'
+    """
+    cur.execute(married_couple_query)
+    married_couple = cur.fetchall()
+    con.close
+    for person1, person2, start_date, type in married_couple:
+        print(f'{person1} has been a {type} of {person2} since {start_date}.')    
     con = sqlite3.connect(db_path)
     return
 
@@ -38,6 +50,9 @@ def save_married_couples_csv(married_couples, csv_path):
         csv_path (str): Path of CSV file
     """
     # TODO: Function body
+    df = pd.Dataframe (married_couples, columns=['Person1', 'Person 2', 'Start Date'])
+    df.to_cs(csv_path, index=False)
+    print(f'Couples report saved to {csv_path}')
     # Hint: We did this in Lab 7.
     return
 
